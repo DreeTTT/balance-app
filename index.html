@@ -1,227 +1,108 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Баланс — финансовый помощник</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f5efe6">
+<title>Баланс — личные финансы</title>
 <style>
-:root{--bg:#f5f6f8;--card:#fff;--text:#17191d;--muted:#7b808a;--line:#e9ebef;--accent:#5b5ce2;--green:#15966a;--red:#dc4c4c;--shadow:0 8px 30px #1111}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-.app{max-width:480px;margin:auto;min-height:100vh;padding-bottom:88px}.top{padding:22px 18px 10px;display:flex;justify-content:space-between;align-items:center}.brand{font-weight:800;font-size:23px}.month{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 10px;color:#555}
-main{padding:8px 16px}.card{background:var(--card);border-radius:20px;padding:18px;margin:10px 0;box-shadow:0 4px 20px #111108}.balance .label{color:var(--muted)}.balance .num{font-size:36px;font-weight:800;margin:4px 0 14px}.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{padding:12px;border-radius:14px;background:#f7f7fa}.stat b{display:block;font-size:18px;margin-top:3px}.income b{color:var(--green)}.expense b{color:var(--red)}
-.section-title{display:flex;justify-content:space-between;align-items:center;font-weight:750;margin:20px 3px 8px}.link{color:var(--accent);font-size:13px}
-canvas{width:100%;height:150px}.cats{display:grid;gap:12px}.catrow{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center}.icon{width:34px;height:34px;border-radius:11px;background:#f0f0ff;display:grid;place-items:center}.bar{height:7px;background:#eceef2;border-radius:9px;margin-top:5px;overflow:hidden}.fill{height:100%;background:var(--accent);border-radius:9px}.amount{font-weight:700}.tx{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--line)}.tx:last-child{border:0}.tx .info{flex:1}.tx small{color:var(--muted)}.tx .amt{font-weight:750}.plus{color:var(--green)}.minus{color:var(--red)}
-.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);max-width:480px;width:100%;height:74px;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;align-items:center;z-index:5}.nav button{border:0;background:none;color:#858994;font:12px inherit}.nav button.active{color:var(--accent);font-weight:700}.add{width:52px;height:52px;border-radius:17px;background:var(--accent)!important;color:#fff!important;font-size:28px!important;box-shadow:0 8px 20px #5b5ce255;margin:auto}
-.screen{display:none}.screen.active{display:block}
-.list{background:var(--card);border-radius:18px;padding:8px 16px}.filter{display:flex;gap:7px;overflow:auto;margin:8px 0 14px}.pill{border:1px solid var(--line);background:#fff;border-radius:20px;padding:8px 12px;white-space:nowrap}.pill.sel{background:#eeeefe;border-color:#d9d9ff;color:var(--accent)}
-.insight{background:#f0f0ff;border-radius:16px;padding:14px}.insight b{display:block;margin-bottom:4px}.goal{padding:13px 0;border-bottom:1px solid var(--line)}.goal:last-child{border:0}.goalhead{display:flex;justify-content:space-between}.goalbar{height:9px;background:#eceef2;border-radius:10px;margin:9px 0}.modal{position:fixed;inset:0;background:#0006;display:none;align-items:flex-end;z-index:20}.modal.show{display:flex}.sheet{background:#fff;width:100%;max-width:480px;margin:auto;border-radius:24px 24px 0 0;padding:20px}.sheet h2{margin:0 0 15px}.field{width:100%;padding:14px;border:1px solid var(--line);border-radius:13px;margin:7px 0;font:inherit}.type{display:grid;grid-template-columns:1fr 1fr;gap:8px}.type button{padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff}.type .chosen{background:#eeeefe;border-color:#cacaFF;color:var(--accent)}.submit{width:100%;padding:14px;border:0;border-radius:13px;background:var(--accent);color:#fff;font-weight:700;margin-top:8px;font:inherit}.close{float:right;border:0;background:none;font-size:24px}
-@media(min-width:600px){body{padding:20px}.app{background:var(--bg)}}
-</style>
-
-<style id="persistence-style">
-.saved-note{font-size:12px;opacity:.62;margin-top:8px}
-</style>
-
-
-<link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#ffffff">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Баланс">
-<link rel="apple-touch-icon" href="icon-180.png">
-
-</head>
-<body>
-<div class="app">
-<header class="top"><div class="brand">Баланс</div><div class="month">Сентябрь 2026 ▾</div></header>
-<main>
-<section id="home" class="screen active">
-<div class="card balance"><div class="label">Общий баланс</div><div class="num" id="balance">79 700 ₽</div><div class="stats"><div class="stat income">Доходы<b id="income">85 000 ₽</b></div><div class="stat expense">Расходы<b id="expense">5 300 ₽</b></div></div></div>
-<div class="section-title">Баланс <span class="link">Этот месяц</span></div>
-<div class="card"><canvas id="chart" width="440" height="150"></canvas></div>
-<div class="section-title">Расходы по категориям <span class="link" onclick="show('analytics')">Все</span></div>
-<div class="card cats" id="cats"></div>
-<div class="section-title">Последние операции <span class="link" onclick="show('transactions')">Все</span></div>
-<div class="card" id="recent"></div>
-<div class="card insight"><b>Анализ месяца</b><span id="insight">После добавления операций приложение начнёт находить закономерности.</span></div>
-</section>
-
-<section id="transactions" class="screen">
-<div class="section-title">Операции</div>
-<div class="filter"><button class="pill sel">Все</button><button class="pill">Доходы</button><button class="pill">Расходы</button><button class="pill">Категория</button></div>
-<div class="list" id="alltx"></div>
-</section>
-
-<section id="analytics" class="screen">
-<div class="section-title">Аналитика</div>
-<div class="card balance"><div class="label">Расходы за месяц</div><div class="num" id="anExpense">5 300 ₽</div><div class="stats"><div class="stat">Средний день<b id="avg">176 ₽</b></div><div class="stat">Операций<b id="count">4</b></div></div></div>
-<div class="section-title">Куда уходят деньги?</div><div class="card cats" id="anCats"></div>
-<div class="section-title">Что заметил Баланс?</div><div class="card insight"><b>Автоматический анализ</b><span id="anInsight">Добавьте несколько расходов — и здесь появятся сравнения, крупные траты и регулярные платежи.</span></div>
-</section>
-
-<section id="goals" class="screen">
-<div class="section-title">Цели</div>
-<div class="card">
-<div class="goal"><div class="goalhead"><b>🏖 Отпуск</b><span>62 500 / 100 000 ₽</span></div><div class="goalbar"><div class="fill" style="width:62.5%"></div></div><small>Осталось 37 500 ₽</small></div>
-<div class="goal"><div class="goalhead"><b>🛟 Финансовая подушка</b><span>42 000 / 150 000 ₽</span></div><div class="goalbar"><div class="fill" style="width:28%"></div></div><small>Осталось 108 000 ₽</small></div>
-</div></section>
-
-<section id="settings" class="screen">
-<div class="section-title">Настройки</div>
-<div class="card">
-<div class="tx"><div class="info"><b>Счета</b><small>Основная карта · Накопления · Наличные</small></div><span>›</span></div>
-<div class="tx"><div class="info"><b>Категории</b><small>Редактирование категорий и правил</small></div><span>›</span></div>
-<div class="tx"><div class="info"><b>Тема</b><small>Системная</small></div><span>›</span></div>
-</div>
-</section>
-</main>
-<nav class="nav">
-<button class="active" onclick="show('home',this)">⌂<br>Главная</button>
-<button onclick="show('transactions',this)">☷<br>Операции</button>
-<button class="add" onclick="openModal()">+</button>
-<button onclick="show('analytics',this)">◔<br>Аналитика</button>
-<button onclick="show('goals',this)">◎<br>Цели</button>
-</nav>
-</div>
-
-<div class="modal" id="modal"><div class="sheet">
-<button class="close" onclick="closeModal()">×</button><h2>Новая операция</h2>
-<input class="field" id="desc" placeholder="Например: продукты в Пятёрочке">
-<input class="field" id="amount" type="number" placeholder="Сумма, ₽">
-<div class="type"><button id="expBtn" class="chosen" onclick="setType('expense')">Расход</button><button id="incBtn" onclick="setType('income')">Доход</button></div>
-<select class="field" id="cat"><option>Автоопределение</option><option>Продукты</option><option>Рестораны</option><option>Транспорт</option><option>Развлечения</option><option>Покупки</option><option>Жильё</option><option>Другое</option></select>
-<button class="submit" onclick="addTx()">Добавить</button>
-</div></div>
-
+:root{--bg:#f5efe6;--card:#fffaf3;--soft:#eee2d2;--text:#30271f;--muted:#8a7968;--coffee:#5a4030;--coffee2:#765641;--income:#607b62;--expense:#9b5f4c;--line:rgba(90,64,48,.12);--shadow:0 14px 40px rgba(75,52,38,.08)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Inter,Arial,sans-serif}.app{max-width:1180px;margin:auto;padding:30px 24px 100px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}.brand{font-size:24px;font-weight:700}.sub{color:var(--muted);font-size:14px;margin-top:4px}.avatar{width:42px;height:42px;border:0;border-radius:50%;background:var(--coffee);color:#fff;font-weight:700}.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:12px;align-items:stretch}.hero-card{background:linear-gradient(145deg,#fffaf3 0%,#f4e8d9 100%);position:relative;overflow:hidden}.hero-card:after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(118,86,65,.06);right:-80px;top:-90px}.goal-card{background:linear-gradient(145deg,#fffdf9,#f1e5d7);display:flex;flex-direction:column;justify-content:space-between}.goal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.goal-value{font-size:28px;font-weight:750;margin-top:5px}.goal-progress{height:10px;background:#eadbca;border-radius:99px;overflow:hidden;margin:18px 0 9px}.goal-progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--coffee),var(--coffee2));border-radius:inherit;transition:width .5s ease}.goal-foot{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}.goal-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.goal-edit{border:0;background:var(--soft);color:var(--coffee);border-radius:12px;padding:8px 11px;cursor:pointer;font-weight:650}.goal-step{width:34px;height:34px;border:0;background:var(--soft);color:var(--coffee);border-radius:11px;cursor:pointer;font-size:20px;font-weight:700;line-height:1;transition:.2s}.goal-step:hover{transform:scale(1.07);background:#e7d7c5}.goal-step.plus{color:var(--income)}.goal-info-icon{font-size:18px;padding:7px 9px;display:inline-grid;place-items:center}.goal-amount-box{width:min(360px,100%)}.goal-amount-input{width:100%;margin:16px 0 8px;border:1px solid var(--line);background:#fffdf9;border-radius:14px;padding:13px;font:inherit;outline:none}.goal-amount-input:focus{border-color:rgba(90,64,48,.4);box-shadow:0 0 0 4px rgba(90,64,48,.06)}.goal-amount-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.goal-amount-actions .btn{width:100%}.dashboard-mini{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}.mini-kpi{background:rgba(255,255,255,.48);border:1px solid rgba(90,64,48,.08);border-radius:16px;padding:12px}.mini-kpi span{display:block;color:var(--muted);font-size:11px}.mini-kpi b{display:block;margin-top:4px;font-size:16px}.card,.stat,.row,.bar{transition:transform .25s ease,box-shadow .25s ease,background-color .25s ease}.card{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:22px;box-shadow:var(--shadow)}.card:hover{transform:scale(1.012);box-shadow:0 20px 48px rgba(75,52,38,.13)}.label{color:var(--muted);font-size:14px}.balance{font-size:48px;font-weight:750;letter-spacing:-2px;margin:8px 0 22px}.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}.stat{background:#eee3d5;border-radius:18px;padding:16px}.stat:hover{transform:scale(1.025);box-shadow:0 10px 25px rgba(75,52,38,.09)}.income-stat{background:#e5dfd4}.expense-stat{background:#e4d8cc}.stat span{display:block;color:var(--muted);font-size:13px;margin-bottom:7px}.stat b{font-size:20px}.income{color:var(--income)}.expense{color:var(--expense)}.title{font-size:18px;font-weight:700;margin:0 0 16px}.row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}.row:last-child{border-bottom:0}.left{display:flex;align-items:center;gap:12px}.icon{width:38px;height:38px;border-radius:13px;background:var(--soft);display:grid;place-items:center}.name{font-weight:600}.meta{font-size:12px;color:var(--muted);margin-top:3px}.switch{display:flex;gap:7px;margin-top:20px}.switch button{border:0;background:transparent;color:var(--muted);padding:9px 13px;border-radius:12px;cursor:pointer;transition:.2s}.switch button:hover{background:#f3e9dc;transform:translateY(-1px)}.switch button.active{background:var(--soft);color:var(--coffee);font-weight:650}.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.chart-subtitle{font-size:13px;font-weight:700;margin:8px 0 2px}.chart{height:230px;display:flex;align-items:end;gap:7px;padding-top:15px}.bar-wrap{height:100%;flex:1;display:flex;align-items:end;justify-content:center;position:relative;cursor:pointer}.bar{width:100%;max-width:18px;background:var(--soft);border-radius:9px 9px 4px 4px;min-height:3px}.bar:hover{transform:scaleY(1.06) scaleX(1.08);background:var(--coffee2)}.bar.active{background:var(--coffee)}.day{position:absolute;bottom:-22px;font-size:10px;color:var(--muted);white-space:nowrap}.full{grid-column:1/-1;margin-top:0}.chart-hint{margin-top:28px;padding-top:4px}.empty{color:var(--muted);text-align:center;padding:28px 10px}.add{position:fixed;right:28px;bottom:28px;border:0;background:var(--coffee);color:#fff;border-radius:18px;padding:15px 22px;font-weight:700;box-shadow:0 12px 30px rgba(58,39,27,.25);cursor:pointer;transition:transform .2s ease,box-shadow .2s ease}.add:hover{transform:scale(1.06);box-shadow:0 16px 34px rgba(58,39,27,.3)}
+.modal{position:fixed;inset:0;background:rgba(48,39,31,.32);backdrop-filter:blur(7px);display:none;align-items:center;justify-content:center;padding:18px;z-index:10}.modal.show{display:flex}.modal-box{width:min(620px,100%);max-height:90vh;overflow:auto;background:var(--card);border-radius:28px;padding:26px;box-shadow:0 30px 80px rgba(40,27,18,.25);animation:pop .22s ease}.modal-head{display:flex;justify-content:space-between;align-items:center}.close{border:0;background:var(--soft);width:36px;height:36px;border-radius:12px;cursor:pointer;font-size:18px}.input{width:100%;margin:18px 0 10px;border:1px solid var(--line);background:#fffdf9;border-radius:17px;padding:16px;font:inherit;outline:none}.input:focus{border-color:rgba(90,64,48,.4);box-shadow:0 0 0 4px rgba(90,64,48,.06)}.hint{color:var(--muted);font-size:13px;line-height:1.45}.preview{margin-top:16px}.preview-item{display:flex;justify-content:space-between;align-items:center;background:#f7f0e7;border-radius:16px;padding:13px 15px;margin-top:8px}.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}.row-actions{display:flex;gap:7px;align-items:center}.mini-btn{border:0;background:var(--soft);color:var(--coffee);width:34px;height:34px;border-radius:11px;cursor:pointer;transition:.2s}.mini-btn:hover{transform:scale(1.08);background:#e5d6c4}.confirm-box{margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:16px;background:#fffdf9}.confirm-title{font-weight:700;margin-bottom:6px}.edit-fields{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}.edit-fields input,.edit-fields select{width:100%;border:1px solid var(--line);background:white;border-radius:11px;padding:9px;font:inherit}.edit-fields .wide{grid-column:1/-1}.danger{color:var(--expense)}.btn{border:0;border-radius:14px;padding:12px 17px;font-weight:650;cursor:pointer}.btn.secondary{background:var(--soft);color:var(--coffee)}.btn.primary{background:var(--coffee);color:white}.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);opacity:0;background:var(--coffee);color:#fff;padding:12px 17px;border-radius:14px;transition:.25s;z-index:20}.toast.show{opacity:1;transform:translate(-50%,0)}.detail-list{margin-top:12px}.detail-total{display:flex;justify-content:space-between;gap:12px;padding:15px;border-radius:16px;background:#f7f0e7;margin-bottom:10px}.detail-empty{padding:24px 10px;text-align:center;color:var(--muted)}.date-input{appearance:none}
+@keyframes pop{from{opacity:0;transform:scale(.97) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@media(max-width:800px){.dashboard-mini{grid-template-columns:1fr 1fr}.goal-value{font-size:23px}.chart-grid{grid-template-columns:1fr;gap:18px}.app{padding:20px 14px 100px}.grid{grid-template-columns:1fr}.full{grid-column:auto}.card{border-radius:23px;padding:20px}.balance{font-size:40px}.add{right:16px;bottom:18px}.chart{height:200px}.edit-fields{grid-template-columns:1fr}.edit-fields .wide{grid-column:auto}}
+</style></head>
+<body><main class="app">
+<header class="top"><div><div class="brand">Баланс</div><div class="sub" id="periodLabel"></div></div><button class="avatar">И</button></header>
+<div class="grid">
+<section class="card hero-card"><div class="label">Баланс за выбранный период</div><div class="balance" id="balance">0 ₽</div><div class="stats"><div class="stat income-stat"><span>Доходы</span><b class="income" id="income">0 ₽</b></div><div class="stat expense-stat"><span>Расходы</span><b class="expense" id="expenses">0 ₽</b></div></div><div class="switch" id="periodSwitch"><button data-period="day">День</button><button data-period="week">Неделя</button><button class="active" data-period="month">Месяц</button><button data-period="year">Год</button></div></section>
+<section class="card goal-card"><div class="goal-head"><div><div class="label">Финансовая цель</div><div class="goal-value" id="goalName">Накопить 100 000 ₽</div></div><div class="goal-actions"><button class="goal-step plus" id="goalPlus" title="Изменить накопленную сумму">+</button><button class="goal-edit goal-info-icon" id="goalInfo" title="Информация">ⓘ</button><button class="goal-edit" id="goalBtn">Настроить</button></div></div><div class="goal-progress"><span id="goalProgress"></span></div><div class="goal-foot"><span id="goalCurrent">0 ₽ накоплено</span><span id="goalPercent">0%</span></div><div class="dashboard-mini"><div class="mini-kpi"><span>Осталось</span><b id="goalRemaining">0 ₽</b></div><div class="mini-kpi"><span>Цель</span><b id="goalTargetMini">0 ₽</b></div><div class="mini-kpi"><span>Накоплено</span><b class="income" id="goalSavedMini">0 ₽</b></div></div></section>
+<section class="card full"><div class="title">Динамика финансов</div><div class="label" id="chartLabel"></div><div class="chart-grid"><div><div class="chart-subtitle expense">Расходы</div><div class="chart" id="chart"></div></div><div><div class="chart-subtitle income">Доходы</div><div class="chart" id="incomeChart"></div></div></div><div class="hint chart-hint">Нажми на столбик, чтобы открыть статистику за конкретный день, неделю или месяц.</div></section>
+<section class="card"><div class="title">Категории</div><div id="categories"></div></section>
+<section class="card"><div class="title">Статистика периода</div><div class="row"><div><div class="name">Средний расход</div><div class="meta" id="averageMeta">в день</div></div><b id="average">0 ₽</b></div><div class="row"><div><div class="name">Самый дорогой день</div><div class="meta" id="expensiveDayMeta">нет данных</div></div><b id="expensiveDay">0 ₽</b></div><div class="row"><div><div class="name">До конца месяца</div><div class="meta">прогноз остатка</div></div><b class="income" id="forecast">0 ₽</b></div></section>
+<section class="card full"><div class="title">Последние операции</div><div id="transactions"></div></section>
+</div></main>
+<button class="add" id="addBtn">＋ Добавить</button>
+<div class="modal" id="modal"><div class="modal-box"><div class="modal-head"><div><div class="title" id="modalTitle" style="margin:0">Добавить операцию</div><div class="hint" id="modalHint">Напиши обычными словами, что произошло.</div></div><button class="close" id="closeBtn">×</button></div><input class="input" id="operationInput" placeholder="Например: купил продукты 2400" autocomplete="off"><div class="edit-fields" style="margin-top:0"><label class="hint">Дата и время<input id="addDate" class="date-input" type="datetime-local" style="margin-top:6px"></label></div><div class="hint">Дата понимается в любом месте фразы: «кофе 350 5 октября», «кофе вчера 350», «кофе 350 вчера», «зарплата завтра 85000», «через 3 дня такси 500», а также время: «кофе 350 завтра в 18:30».</div><div class="preview" id="preview"></div><div class="modal-actions"><button class="btn secondary" id="cancelBtn">Отмена</button><button class="btn primary" id="saveBtn">Сохранить</button></div></div></div>
+<div class="modal" id="goalAmountModal"><div class="modal-box goal-amount-box"><div class="modal-head"><div><div class="title" style="margin:0">Изменить накопления</div><div class="hint">Укажи сумму, которую нужно добавить или вычесть из финансовой цели.</div></div><button class="close" id="goalAmountClose">×</button></div><input class="goal-amount-input" id="goalAmountInput" type="number" min="0" step="1" placeholder="Например: 5000"><div class="goal-amount-actions"><button class="btn secondary" id="goalSubtract">− Вычесть</button><button class="btn primary" id="goalAdd">＋ Добавить</button></div></div></div>
+<div class="modal" id="detailModal"><div class="modal-box"><div class="modal-head"><div><div class="title" id="detailTitle" style="margin:0">Статистика</div><div class="hint" id="detailHint"></div></div><button class="close" id="detailClose">×</button></div><div id="detailBody"></div></div></div>
+<div class="toast" id="toast"></div>
 <script>
-const STORAGE_KEY='balance_transactions_v4';
-const defaultTx=[];
-
-function loadTransactions(){
- try{
-   const saved=localStorage.getItem(STORAGE_KEY);
-   if(saved){
-     const parsed=JSON.parse(saved);
-     if(Array.isArray(parsed)) return parsed;
-   }
- }catch(e){}
- return defaultTx.map(x=>({...x}));
-}
-let tx=loadTransactions();
-let type='expense';
-
-function saveTransactions(){
- try{localStorage.setItem(STORAGE_KEY,JSON.stringify(tx));}
- catch(e){console.error('Не удалось сохранить данные',e);}
-}
-
-const fmt=n=>new Intl.NumberFormat('ru-RU').format(Math.round(n))+' ₽';
-function show(id,btn){
- document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
- document.getElementById(id).classList.add('active');
- document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
- if(btn)btn.classList.add('active');
- render();
-}
-function openModal(){document.getElementById('modal').classList.add('show')}
-function closeModal(){document.getElementById('modal').classList.remove('show')}
-function setType(t){
- type=t;
- expBtn.classList.toggle('chosen',t==='expense');
- incBtn.classList.toggle('chosen',t==='income');
-}
-function autoCat(s){
- s=s.toLowerCase();
- if(/пятер|магнит|продукт|еда|молок|хлеб/.test(s))return'Продукты';
- if(/кафе|ресторан|додо|бургер|кофе|пицц/.test(s))return'Рестораны';
- if(/такси|uber|яндекс го|метро|автобус|бензин/.test(s))return'Транспорт';
- if(/steam|игр|game|кино|netflix|spotify/.test(s))return'Развлечения';
- if(/ozon|wildberries|одежд|покупк/.test(s))return'Покупки';
- if(/аренд|жиль|коммун/.test(s))return'Жильё';
- return'Другое';
-}
-function addTx(){
- const d=document.getElementById('desc').value.trim()||'Операция';
- const a=Number(document.getElementById('amount').value);
- if(!a)return;
- let c=document.getElementById('cat').value;
- c=c==='Автоопределение'?autoCat(d):c;
- tx.unshift({d,a,t:type,c,id:Date.now()});
- saveTransactions();
- document.getElementById('desc').value='';
- document.getElementById('amount').value='';
- closeModal();
- render();
- showSavedToast('Операция сохранена');
-}
-function showSavedToast(text){
- let el=document.getElementById('savedToast');
- if(!el){
-   el=document.createElement('div');
-   el.id='savedToast';
-   el.style.cssText='position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(15px);background:#171717;color:#fff;padding:11px 16px;border-radius:14px;font-size:14px;opacity:0;transition:.25s;z-index:9999;pointer-events:none';
-   document.body.appendChild(el);
+const KEY='balance_transactions_v3';
+let transactions=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem('balance_transactions_v2')||localStorage.getItem('balance_transactions_v1')||'[]');
+let period='month';
+const incomeWords=['зарплат','зп','з.п','з/п','аванс','подработ','преми','получил','получила','получение','доход','подар','подарок','вернул долг','возврат','вернули','вернули деньги','кэшбэк','кешбек','фриланс','оплатили','оплата труда','стипенд','пенси','пособи','перевод от','начислили','гонорар','выигрыш','продал','продажа'];
+const cats=[
+['Продукты','🛒',['продукт','продукты','магазин','супермаркет','ашан','пятероч','перекрест','магнит','лента','еда','хлеб','молоко','мясо','овощ','фрукт','сыр','колбас','бакале','попить','пить','напиток','напитки','вода','сок','газиров','перекус','продоволь','чипс','сладост','конфет','йогурт']],
+['Кафе и рестораны','☕',['кофе','кофейня','кафе','ресторан','бар','пицц','бургер','суши','ролл','макдон','вкусно','столов','доставка еды','обед','ужин','капучино','латте','старбакс']],
+['Транспорт','🚗',['такси','маршрутк','автобус','троллейбус','трамва','метро','транспорт','бензин','заправ','азс','топливо','машин','авто','парков','паркинг','проезд','электричк','поезд','жд билет','самолет','авиабилет','каршеринг','яндекс такси','uber','bolt','билет на автобус']],
+['Жильё','🏠',['квартир','аренд','жиль','коммунал','коммуналк','свет','электрич','вода за','газ','отоплен','интернет домой','домофон','ремонт жилья']],
+['Покупки','🛍️',['покупк','товар','маркетплейс','озон','ozon','вб','wildberries','яндекс маркет','amazon','заказ','техника','телефон','компьютер','аксессуар','подарок покуп']],
+['Развлечения','🎮',['кино','игр','игра','развлеч','концерт','театр','музей','боулинг','клуб','караоке','стендап']],
+['Здоровье','❤️',['аптек','врач','лекар','здоров','стомат','анализ','клиник','медицин','витамин']],
+['Подписки','🔔',['подпис','spotify','netflix','ютуб премиум','youtube premium','кинопоиск','иви','okko','discord nitro','apple music']],
+['Одежда','👕',['одежд','обув','кроссов','куртк','футболк','джинс','плать','рубашк','магазин одежды']],
+['Питомцы','🐾',['собак','пёс','пес','кошк','кот','корм','ветерин','зоомагаз','питомц']],
+['Другое','•',[]]
+];
+const $=id=>document.getElementById(id); const money=n=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(Math.round(n))+' ₽'; const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+function icon(name){return (cats.find(c=>c[0]===name)||cats[cats.length-1])[1]}
+function normalizeDate(d){return new Date(d).toISOString()}
+function parseDateText(text){
+ let now=new Date(); now.setSeconds(0,0); let d=new Date(now);
+ let m=text.match(/(?:на|за|от)?\s*(\d{1,2})[.\/-](\d{1,2})(?:[.\/-](\d{2,4}))?/);
+ if(m){let y=m[3]?Number(m[3]):now.getFullYear();if(y<100)y+=2000;d=new Date(y,Number(m[2])-1,Number(m[1]),12,0)}
+ else {let months={'январ':0,'феврал':1,'март':2,'апрел':3,'май':4,'июн':5,'июл':6,'август':7,'сентябр':8,'октябр':9,'ноябр':10,'декабр':11};let found=false;for(const k in months){let mm=text.match(new RegExp('(\\d{1,2})\\s*'+k));if(mm){d=new Date(now.getFullYear(),months[k],Number(mm[1]),12,0);found=true;break}}
+ if(!found){let rel=text.match(/через\s+(\d+)\s*(дн(?:я|ей)?|недел(?:ю|и|ь)?|месяц(?:а|ев)?)/i);if(rel){let n=Number(rel[1]);if(/нед/i.test(rel[2]))n*=7;if(/меся/i.test(rel[2])){d=new Date(now);d.setMonth(d.getMonth()+n)}else{d=new Date(now);d.setDate(d.getDate()+n)}}else if(/послезавтра/i.test(text)){d=new Date(now);d.setDate(d.getDate()+2)}else if(/завтра/i.test(text)){d=new Date(now);d.setDate(d.getDate()+1)}else if(/вчера/i.test(text)){d=new Date(now);d.setDate(d.getDate()-1)}else if(/позавчера/i.test(text)){d=new Date(now);d.setDate(d.getDate()-2)} }
  }
- el.textContent=text;
- requestAnimationFrame(()=>{el.style.opacity='1';el.style.transform='translateX(-50%) translateY(0)'});
- clearTimeout(window.__toastTimer);
- window.__toastTimer=setTimeout(()=>{el.style.opacity='0';el.style.transform='translateX(-50%) translateY(15px)'},1400);
+ let tm=text.match(/(?:в|на)\s*(\d{1,2})(?::(\d{2}))?\s*(?:час(?:а|ов)?|ч\.?|$)/i) || text.match(/\b(\d{1,2}):(\d{2})\b/);
+ if(tm){let h=Number(tm[1]),min=Number(tm[2]||0);d.setHours(h,min,0,0)} else if(/завтра|через\s+\d|послезавтра/i.test(text)){d.setHours(12,0,0,0)}
+ return d;
 }
-function render(){
- const income=tx.filter(x=>x.t==='income').reduce((s,x)=>s+x.a,0);
- const expense=tx.filter(x=>x.t==='expense').reduce((s,x)=>s+x.a,0);
- const balance=income-expense;
- document.getElementById('balance').textContent=fmt(balance);
- document.getElementById('income').textContent=fmt(income);
- document.getElementById('expense').textContent=fmt(expense);
-
- const by={};
- tx.filter(x=>x.t==='expense').forEach(x=>by[x.c]=(by[x.c]||0)+x.a);
- let rows=Object.entries(by).sort((a,b)=>b[1]-a[1]);
- let max=rows[0]?.[1]||1;
- const icons={'Продукты':'🛒','Рестораны':'🍔','Транспорт':'🚕','Развлечения':'🎮','Покупки':'🛍','Жильё':'🏠','Другое':'📦'};
- const catHTML=rows.map(([c,v])=>`<div class="catrow"><div class="icon">${icons[c]||'📦'}</div><div><b>${c}</b><div class="bar"><div class="fill" style="width:${v/max*100}%"></div></div></div><div class="amount">${fmt(v)}</div></div>`).join('');
- document.getElementById('cats').innerHTML=catHTML||'<small>Пока нет расходов</small>';
- document.getElementById('anCats').innerHTML=catHTML||'<small>Пока нет расходов</small>';
-
- const txHTML=tx.map(x=>`<div class="tx"><div class="icon">${x.t==='income'?'↑':(icons[x.c]||'•')}</div><div class="info"><b>${x.d}</b><small>${x.c} · сегодня</small></div><div class="amt ${x.t==='income'?'plus':'minus'}">${x.t==='income'?'+':'−'}${fmt(x.a)}</div></div>`).join('');
- document.getElementById('recent').innerHTML=txHTML.slice(0,5);
- document.getElementById('alltx').innerHTML=txHTML;
-
- document.getElementById('anExpense').textContent=fmt(expense);
- document.getElementById('avg').textContent=fmt(expense/30);
- document.getElementById('count').textContent=tx.filter(x=>x.t==='expense').length;
- document.getElementById('insight').textContent=expense?`Главная категория расходов — ${rows[0][0]} (${fmt(rows[0][1])}). Всего расходов: ${fmt(expense)}.`:'После добавления операций приложение начнёт находить закономерности.';
- document.getElementById('anInsight').textContent=expense?`Больше всего ушло на «${rows[0][0]}». Можно сравнивать категории, находить крупные операции и отслеживать бюджеты.`:'Добавьте несколько расходов — и здесь появится автоматический анализ.';
- drawChart(expense);
-}
-function drawChart(expense){
- const c=document.getElementById('chart'),ctx=c.getContext('2d'),w=c.width,h=c.height;
- ctx.clearRect(0,0,w,h);
- ctx.strokeStyle='#e6e7eb';
- for(let y=25;y<h;y+=35){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
- let vals=[12,28,24,39,34,30,Math.max(15,55-expense/500)];
- let max=Math.max(...vals),min=Math.min(...vals);
- ctx.beginPath();
- vals.forEach((v,i)=>{let x=i*w/(vals.length-1),y=h-20-(v-min)/(max-min||1)*(h-45);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});
- ctx.strokeStyle='#5b5ce2';ctx.lineWidth=4;ctx.stroke();
-}
-function clearSavedData(){
- if(confirm('Удалить все сохранённые операции?')){
-   localStorage.removeItem(STORAGE_KEY);
-   tx=defaultTx.map(x=>({...x}));
-   render();
-   showSavedToast('Данные сброшены');
- }
-}
+function cleanDateWords(s){return s.replace(/(?:на|за|от)?\s*\d{1,2}[.\/-]\d{1,2}(?:[.\/-]\d{2,4})?/gi,'').replace(/\b(?:послезавтра|позавчера|завтра|вчера|сегодня)\b/gi,'').replace(/\bчерез\s+\d+\s*(?:дн(?:я|ей)?|недел(?:ю|и|ь)?|месяц(?:а|ев)?)\b/gi,'').replace(/\b(?:в|на)\s*\d{1,2}(?::\d{2})?\s*(?:час(?:а|ов)?|ч\.?)?\b/gi,'').replace(/\b\d{1,2}:\d{2}\b/g,'').replace(/\b\d{1,2}\s*(?:январ[ья]?|феврал[ья]?|март[а]?|апрел[я]?|ма[йя]|июн[я]?|июл[я]?|август[а]?|сентябр[я]?|октябр[я]?|ноябр[я]?|декабр[я]?)\b/gi,'').replace(/\s+/g,' ').trim()}
+function amountFrom(s){let m=s.match(/(?:^|\s)(\d[\d\s]*(?:[.,]\d{1,2})?)\s*(?:₽|руб(?:ля|лей|ль)?|р\.?)(?=\s|$)/i)||s.match(/(?:^|\s)(\d[\d\s]*(?:[.,]\d{1,2})?)(?=\s*$)/);if(!m)return 0;return Number(m[1].replace(/\s/g,'').replace(',','.'))}
+function typeOf(s){let l=s.toLowerCase();return incomeWords.some(w=>l.includes(w))?'income':'expense'}
+function category(s){let l=s.toLowerCase();if(typeOf(s)==='income'){if(/зарплат|\bзп\b|з\.п|з\/п|аванс|преми/.test(l))return 'Зарплата';if(/подработ|фриланс|гонорар/.test(l))return 'Подработка';if(/подар/.test(l))return 'Подарки';if(/возврат|вернул|вернули|кэшбэк|кешбек/.test(l))return 'Возврат денег';return 'Другое'}let best='Другое',score=0;for(const [name,,words] of cats){for(const w of words){if(l.includes(w)&&w.length>score){score=w.length;best=name}}}return best}
+function splitOperations(s){return s.split(/\s*(?:\s+и\s+|,|;|\s+потом\s+|\s+а\s+)\s*/i).map(x=>x.trim()).filter(Boolean)}
+function hasDateMention(text){return /(?:\d{1,2}[.\/-]\d{1,2}(?:[.\/-]\d{2,4})?|\d{1,2}\s*(?:январ|феврал|март|апрел|май|июн|июл|август|сентябр|октябр|ноябр|декабр)|позавчера|вчера|сегодня|завтра|послезавтра|через\s+\d+\s*(?:дн|недел|месяц)|\b\d{1,2}:\d{2}\b|\b(?:в|на)\s*\d{1,2}(?::\d{2})?\s*(?:час|ч\.)?)/i.test(text)}
+function defaultDateForInput(){let el=$('addDate');return el&&el.value?dateFromInput(el.value):new Date().toISOString()}
+function parseOperations(text){let parts=splitOperations(text),out=[];for(const p of parts){let amount=amountFrom(p);if(!amount)continue;let d=hasDateMention(p)?parseDateText(p):new Date(defaultDateForInput()),clean=cleanDateWords(p).replace(/(?:\d[\d\s]*(?:[.,]\d{1,2})?)(?:\s*(?:₽|руб(?:ля|лей|ль)?|р\.?))?\s*$/i,'').trim();out.push({id:crypto.randomUUID(),text:clean||p,amount,type:typeOf(p),category:category(p),date:normalizeDate(d)})}return out}
+function startOfWeek(d){let x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return x}
+function inPeriod(t){let d=new Date(t.date),n=new Date();if(period==='day')return d.toDateString()===n.toDateString();if(period==='year')return d.getFullYear()===n.getFullYear();if(period==='week'){let s=startOfWeek(n),e=new Date(s);e.setDate(e.getDate()+7);return d>=s&&d<e}return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear()}
+function periodTitle(){let n=new Date();if(period==='day')return new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long',year:'numeric'}).format(n);if(period==='year')return String(n.getFullYear());if(period==='week')return 'Текущая неделя';return new Intl.DateTimeFormat('ru-RU',{month:'long',year:'numeric'}).format(n)}
+function bucketRange(i){let n=new Date();n.setHours(0,0,0,0);if(period==='year'){let s=new Date(n.getFullYear(),i,1);let e=new Date(n.getFullYear(),i+1,1);return [s,e,new Intl.DateTimeFormat('ru-RU',{month:'long',year:'numeric'}).format(s)]}if(period==='week'){let s=startOfWeek(n);s.setDate(s.getDate()+i);let e=new Date(s);e.setDate(e.getDate()+1);return [s,e,new Intl.DateTimeFormat('ru-RU',{weekday:'long',day:'numeric',month:'long'}).format(s)]}let s=new Date(n.getFullYear(),n.getMonth(),i+1);let e=new Date(s);e.setDate(e.getDate()+1);return [s,e,new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long',year:'numeric'}).format(s)]}
+function labelForBucket(i){if(period==='year')return ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'][i-1]||'нет данных';if(period==='week')return ['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресенье'][i-1]||'нет данных';return `${i} число`}
+function loadGoal(){let g=JSON.parse(localStorage.getItem('balance_goal_v1')||'null');if(!g)return{name:'Накопить 100 000 ₽',target:100000,current:0};if(typeof g.current!=='number'){let all=transactions.filter(t=>t.type==='income'||t.type==='expense');g.current=Math.max(0,all.reduce((s,t)=>s+(t.type==='income'?t.amount:-t.amount),0));localStorage.setItem('balance_goal_v1',JSON.stringify(g))}return g}
+function saveGoal(g){localStorage.setItem('balance_goal_v1',JSON.stringify(g));renderGoal()}
+function renderGoal(){let g=loadGoal(),saved=Math.max(0,Number(g.current)||0),target=Math.max(1,Number(g.target)||1),remaining=Math.max(0,target-saved),pct=Math.min(100,Math.round(saved/target*100));$('goalName').textContent=g.name;$('goalProgress').style.width=pct+'%';$('goalCurrent').textContent=money(saved)+' накоплено';$('goalPercent').textContent=pct+'%';$('goalRemaining').textContent=money(remaining);$('goalTargetMini').textContent=money(target);$('goalSavedMini').textContent=money(saved)}
+function changeGoalAmount(delta){let g=loadGoal(),current=Math.max(0,Number(g.current)||0),next=Math.max(0,current+delta);g.current=next;saveGoal(g);showToast(delta>0?`Добавлено к цели: ${money(delta)}`:`Убрано из цели: ${money(Math.abs(delta))}`)}
+function showGoalInfo(){let g=loadGoal(),saved=Math.max(0,Number(g.current)||0),target=Math.max(1,Number(g.target)||1),remaining=Math.max(0,target-saved),pct=Math.min(100,Math.round(saved/target*100));let status=saved>=target?'Цель достигнута':`Осталось накопить ${money(remaining)}`;$('detailTitle').textContent='Финансовая цель';$('detailHint').textContent='Статистика только этой цели — без доходов и расходов из общего дашборда.';$('detailBody').innerHTML=`<div class="detail-total"><div><div class="meta">Накоплено</div><b class="income">${money(saved)}</b></div><div><div class="meta">Цель</div><b>${money(target)}</b></div><div><div class="meta">Прогресс</div><b>${pct}%</b></div></div><div class="row"><div><div class="name">Осталось</div><div class="meta">до достижения цели</div></div><b>${money(remaining)}</b></div><div class="row"><div><div class="name">Статус</div><div class="meta">текущее состояние цели</div></div><b>${status}</b></div><div class="goal-progress" style="margin-top:18px"><span style="width:${pct}%"></span></div>`;detailModal.classList.add('show')}
+function editGoal(){let g=loadGoal(),name=prompt('Название цели',g.name);if(name===null)return;let raw=prompt('Сумма цели в ₽',String(g.target));if(raw===null)return;let target=Number(raw.replace(/\s/g,'').replace(',','.'));if(!target||target<=0){showToast('Укажи корректную сумму');return}saveGoal({name:name.trim()||'Моя цель',target})}
+function render(){let tx=transactions.filter(inPeriod),inc=tx.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0),exp=tx.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);$('balance').textContent=money(inc-exp);$('income').textContent=money(inc);$('expenses').textContent=money(exp);$('periodLabel').textContent='Личные финансы · '+periodTitle();$('chartLabel').textContent=period==='day'?'Операции за сегодня':periodTitle();let elapsed=period==='day'?1:period==='week'?7:(period==='year'?Math.max(1,Math.ceil((new Date()-new Date(new Date().getFullYear(),0,1))/86400000)):new Date().getDate());$('average').textContent=money(exp/elapsed);$('averageMeta').textContent=period==='day'?'за день':'в день';let byDay={},byIncome={};tx.forEach(t=>{let d=new Date(t.date),key=period==='year'?d.getMonth()+1:(period==='week'?((d.getDay()+6)%7)+1:d.getDate());if(t.type==='expense')byDay[key]=(byDay[key]||0)+t.amount;else byIncome[key]=(byIncome[key]||0)+t.amount});let best=Object.entries(byDay).sort((a,b)=>b[1]-a[1])[0];$('expensiveDay').textContent=best?money(best[1]):'0 ₽';$('expensiveDayMeta').textContent=best?labelForBucket(Number(best[0])):'нет данных';let now=new Date(),monthStart=new Date(now.getFullYear(),now.getMonth(),1),nextMonth=new Date(now.getFullYear(),now.getMonth()+1,1),monthTx=transactions.filter(t=>{let d=new Date(t.date);return d>=monthStart&&d<nextMonth}),monthIncome=monthTx.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0),monthExpense=monthTx.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0),monthDays=new Date(now.getFullYear(),now.getMonth()+1,0).getDate(),daysPassed=Math.max(1,Math.min(now.getDate(),monthDays)),projectedExpense=(monthExpense/daysPassed)*monthDays,forecast=monthIncome-projectedExpense;$('forecast').textContent=money(forecast);renderChart(byDay,$('chart'),'expense');renderChart(byIncome,$('incomeChart'),'income');renderCategories(tx,exp);renderTransactions(tx);renderGoal()}
+function renderChart(values,c,type){c.innerHTML='';if(period==='day'){let total=Object.values(values).reduce((a,b)=>a+b,0);let w=document.createElement('div');w.className='bar-wrap';w.style.flex='1';w.onclick=()=>showDetail(new Date().setHours(0,0,0,0),new Date(new Date().setHours(0,0,0,0)).getTime()+86400000,'Сегодня');let b=document.createElement('div');b.className='bar active';b.style.height=(total?70:2)+'%';b.style.maxWidth='70px';if(type==='income')b.style.background='var(--income)';w.append(b);c.append(w);return}let count=period==='year'?12:period==='week'?7:new Date(new Date().getFullYear(),new Date().getMonth()+1,0).getDate(),vals=Array.from({length:count},(_,i)=>values[i+1]||0),m=Math.max(...vals,1);vals.forEach((x,i)=>{let w=document.createElement('div'),b=document.createElement('div'),d=document.createElement('div');w.className='bar-wrap';b.className='bar'+(x===m&&x>0?' active':'');b.style.height=(x?Math.max(4,x/m*88):2)+'%';if(type==='income'){b.style.background='var(--income)';if(x===m&&x>0)b.style.opacity='.95'}d.className='day';d.textContent=period==='year'?['Ян','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'][i]:period==='week'?['Пн','Вт','Ср','Чт','Пт','Сб','Вс'][i]:((i+1)%5===0||i===0?i+1:'');w.onclick=()=>{let [s,e,l]=bucketRange(i);showDetail(s,e,l)};w.append(b,d);c.append(w)})}
+function renderCategories(tx,total){let el=$('categories'),map={};tx.filter(t=>t.type==='expense').forEach(t=>map[t.category]=(map[t.category]||0)+t.amount);let arr=Object.entries(map).sort((a,b)=>b[1]-a[1]);el.innerHTML=arr.length?arr.map(([name,val])=>`<div class="row"><div class="left"><div class="icon">${icon(name)}</div><div><div class="name">${esc(name)}</div><div class="meta">${total?Math.round(val/total*100):0}% расходов</div></div></div><b>${money(val)}</b></div>`).join(''):'<div class="empty">Здесь появятся категории после добавления операций.</div>'}
+function renderTransactions(tx){let el=$('transactions'),arr=[...tx].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,30);el.innerHTML=arr.length?arr.map(t=>`<div class="row"><div class="left"><div class="icon">${t.type==='income'?'💰':icon(t.category)}</div><div><div class="name">${esc(t.text||t.category)}</div><div class="meta">${new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long',year:'numeric'}).format(new Date(t.date))} · ${esc(t.category)}</div></div></div><div class="row-actions"><b class="${t.type==='income'?'income':'expense'}">${t.type==='income'?'+':'−'}${money(t.amount)}</b><button class="mini-btn" data-action="edit" data-id="${t.id}" title="Изменить">✎</button><button class="mini-btn danger" data-action="delete" data-id="${t.id}" title="Удалить">×</button></div></div>`).join(''):'<div class="empty">Пока нет операций. Нажми «＋ Добавить», чтобы начать.</div>'}
+function save(){localStorage.setItem(KEY,JSON.stringify(transactions));render()}
+function dateValue(iso){let d=new Date(iso),p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`}
+function dateFromInput(v){let [date,time='12:00']=v.split('T'),[y,m,d]=date.split('-').map(Number),[hh,mm]=time.split(':').map(Number);return new Date(y,m-1,d,hh||0,mm||0).toISOString()}
+const modal=$('modal'),detailModal=$('detailModal'),goalAmountModal=$('goalAmountModal'),input=$('operationInput'),preview=$('preview');let pending=[];
+function openGoalAmount(){goalAmountModal.classList.add('show');$('goalAmountInput').value='';setTimeout(()=>$('goalAmountInput').focus(),50)}
+function closeGoalAmount(){goalAmountModal.classList.remove('show');$('goalAmountInput').value=''}
+function applyGoalAmount(sign){let amount=Number($('goalAmountInput').value);if(!amount||amount<=0){showToast('Укажи корректную сумму');return}changeGoalAmount(sign*amount);closeGoalAmount()}
+function categoryOptions(selected){return cats.map(c=>`<option value="${esc(c[0])}" ${c[0]===selected?'selected':''}>${esc(c[0])}</option>`).join('')}
+function editTransaction(id){let t=transactions.find(x=>x.id===id);if(!t)return;resetModal();$('modalTitle').textContent='Изменить операцию';$('modalHint').textContent='Исправь описание, сумму, тип, категорию или дату.';input.value='';preview.innerHTML=`<div class="edit-fields"><input class="wide" id="editText" value="${esc(t.text)}" placeholder="Описание"><input id="editAmount" type="number" value="${t.amount}" min="0"><input id="editDate" class="date-input" type="datetime-local" value="${dateValue(t.date)}"><select id="editType"><option value="expense" ${t.type==='expense'?'selected':''}>Расход</option><option value="income" ${t.type==='income'?'selected':''}>Доход</option></select><select id="editCategory">${categoryOptions(t.category)}</select></div>`;$('saveBtn').textContent='Сохранить изменения';$('saveBtn').onclick=()=>{let amount=Number($('editAmount').value);if(!amount){showToast('Укажи сумму');return}Object.assign(t,{text:$('editText').value.trim()||t.category,amount,type:$('editType').value,category:$('editCategory').value,date:dateFromInput($('editDate').value)});save();closeModal();showToast('Операция изменена')};modal.classList.add('show')}
+function deleteTransaction(id){let t=transactions.find(x=>x.id===id);if(!t)return;if(!confirm(`Удалить операцию «${t.text}» на ${money(t.amount)}?`))return;transactions=transactions.filter(x=>x.id!==id);save();showToast('Операция удалена')}
+function resetModal(){$('modalTitle').textContent='Добавить операцию';$('modalHint').textContent='Напиши обычными словами, что произошло.';$('saveBtn').textContent='Сохранить';$('saveBtn').onclick=saveNew;pending=[]}
+function openModal(){resetModal();let d=new Date(),p=n=>String(n).padStart(2,'0');$('addDate').value=`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;modal.classList.add('show');input.focus();preview.innerHTML=''}
+function closeModal(){modal.classList.remove('show');input.value='';if($('addDate'))$('addDate').value='';preview.innerHTML='';resetModal()}
+function pendingEditor(){return pending.map((t,i)=>`<div class="confirm-box"><div class="confirm-title">Операция ${i+1}</div><div class="edit-fields"><input class="wide" data-p="${i}" data-field="text" value="${esc(t.text)}" placeholder="Описание"><input data-p="${i}" data-field="amount" type="number" min="0" value="${t.amount}"><input data-p="${i}" data-field="date" class="date-input" type="datetime-local" value="${dateValue(t.date)}"><select data-p="${i}" data-field="type"><option value="expense" ${t.type==='expense'?'selected':''}>Расход</option><option value="income" ${t.type==='income'?'selected':''}>Доход</option></select><select data-p="${i}" data-field="category">${categoryOptions(t.category)}</select></div></div>`).join('')}
+function showConfirm(ops){pending=ops;preview.innerHTML=`<div class="confirm-box"><div class="confirm-title">Проверь найденные операции</div><div class="hint">Каждую операцию можно исправить перед сохранением — включая дату.</div></div>${pendingEditor()}`;$('saveBtn').textContent='Подтвердить и сохранить';$('saveBtn').onclick=()=>{if(pending.some(t=>!t.amount||t.amount<=0)){showToast('Проверь суммы');return}transactions.push(...pending);save();closeModal();showToast(`Сохранено операций: ${pending.length}`)}}
+function saveNew(){let ops=parseOperations(input.value);if(!ops.length){showToast('Укажи сумму операции');return}if(ops.length>1){showConfirm(ops);return}transactions.push(ops[0]);save();closeModal();showToast('Операция добавлена')}
+input.addEventListener('input',()=>{if($('saveBtn').textContent!=='Сохранить')return;let ops=parseOperations(input.value);preview.innerHTML=ops.length?`<div class="hint">Найдено: ${ops.length} ${ops.length===1?'операция':'операции'}.</div>`:''})
+$('addDate').addEventListener('change',()=>{if($('saveBtn').textContent==='Сохранить'&&input.value){let ops=parseOperations(input.value);preview.innerHTML=ops.length?`<div class="hint">Найдено: ${ops.length} ${ops.length===1?'операция':'операции'}.</div>`:''}});
+preview.addEventListener('input',e=>{let i=e.target.dataset.p;if(i===undefined)return;let f=e.target.dataset.field;pending[i][f]=f==='amount'?Number(e.target.value):f==='date'?dateFromInput(e.target.value):e.target.value});preview.addEventListener('change',e=>{let i=e.target.dataset.p;if(i===undefined)return;let f=e.target.dataset.field;pending[i][f]=f==='amount'?Number(e.target.value):f==='date'?dateFromInput(e.target.value):e.target.value});
+$('transactions').addEventListener('click',e=>{let b=e.target.closest('button[data-action]');if(!b)return;b.dataset.action==='edit'?editTransaction(b.dataset.id):deleteTransaction(b.dataset.id)});$('goalAmountClose').onclick=closeGoalAmount;$('goalSubtract').onclick=()=>applyGoalAmount(-1);$('goalAdd').onclick=()=>applyGoalAmount(1);goalAmountModal.onclick=e=>{if(e.target===goalAmountModal)closeGoalAmount()};$('goalAmountInput').addEventListener('keydown',e=>{if(e.key==='Enter')applyGoalAmount(1)});
+$('periodSwitch').addEventListener('click',e=>{let b=e.target.closest('button[data-period]');if(!b)return;period=b.dataset.period;document.querySelectorAll('#periodSwitch button').forEach(x=>x.classList.toggle('active',x===b));render()});
+$('goalBtn').onclick=editGoal;$('goalPlus').onclick=()=>openGoalAmount();$('goalInfo').onclick=showGoalInfo;$('addBtn').onclick=openModal;$('closeBtn').onclick=closeModal;$('cancelBtn').onclick=closeModal;modal.onclick=e=>{if(e.target===modal)closeModal()};$('detailClose').onclick=()=>detailModal.classList.remove('show');detailModal.onclick=e=>{if(e.target===detailModal)detailModal.classList.remove('show')};
+function showDetail(start,end,label){let tx=transactions.filter(t=>{let d=new Date(t.date);return d>=new Date(start)&&d<new Date(end)}).sort((a,b)=>new Date(b.date)-new Date(a.date));let inc=tx.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0),exp=tx.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);$('detailTitle').textContent=label;$('detailHint').textContent=`${tx.length} ${tx.length===1?'операция':'операций'} · подробная статистика`;let byCat={};tx.filter(t=>t.type==='expense').forEach(t=>byCat[t.category]=(byCat[t.category]||0)+t.amount);let catsHtml=Object.entries(byCat).sort((a,b)=>b[1]-a[1]).map(([c,v])=>`<div class="row"><div class="left"><div class="icon">${icon(c)}</div><div><div class="name">${esc(c)}</div><div class="meta">${exp?Math.round(v/exp*100):0}% расходов</div></div></div><b>${money(v)}</b></div>`).join('');let list=tx.map(t=>`<div class="row"><div><div class="name">${esc(t.text)}</div><div class="meta">${new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long',year:'numeric'}).format(new Date(t.date))} · ${esc(t.category)}</div></div><b class="${t.type==='income'?'income':'expense'}">${t.type==='income'?'+':'−'}${money(t.amount)}</b></div>`).join('');$('detailBody').innerHTML=`<div class="detail-total"><div><div class="meta">Доходы</div><b class="income">${money(inc)}</b></div><div><div class="meta">Расходы</div><b class="expense">${money(exp)}</b></div><div><div class="meta">Итог</div><b>${money(inc-exp)}</b></div></div><div class="title" style="margin-top:18px">Категории расходов</div>${catsHtml||'<div class="detail-empty">Нет расходов за этот период.</div>'}<div class="title" style="margin-top:18px">Операции</div><div class="detail-list">${list||'<div class="detail-empty">Нет операций за этот период.</div>'}</div>`;detailModal.classList.add('show')}
+function showToast(s){let t=$('toast');t.textContent=s;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
 render();
-</script>
-
-<script id="pwa-register">
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
-}
-</script>
-
-</body></html>
+</script></body></html>
